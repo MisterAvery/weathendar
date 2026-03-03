@@ -10,6 +10,8 @@ export async function register(email, password) {
 // Login
 export async function loginUser(email, password) {
   const userCred = await signInWithEmailAndPassword(auth, email, password);
+  
+  console.log("logged in as: " + userCred.user.email);
   return userCred.user;
 }
 

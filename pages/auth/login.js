@@ -20,8 +20,9 @@ const Login = () => {
   async function handleLogin() {
     // If the username and password are correct, then set the user to the current user
     try {
-      await loginUser(email, password);
-      setUser(user);
+      let newUser = await loginUser(email, password);
+      setUser(newUser);
+     
       router.push('/dashboard');
     } catch(err) {
         console.log('Error logging in', err);

@@ -19,7 +19,7 @@ const DateBar = () => {
 
     return (
         <DateWrapper>
-            { dates.map(date => (<h4>{date[0]}</h4>)) }
+            { dates.map((date, index) => (<h4 key={index}>{date[0]}</h4>)) }
         </DateWrapper>
     )
 }

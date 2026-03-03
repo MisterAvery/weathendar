@@ -6,20 +6,11 @@ import { useStateContext } from '@/context/StateContext'
 import { useRouter } from 'next/router'
 import FlexDiv from '@/components/FlexDiv'
 import DateBar from '@/components/Dashboard/DateBar'
+import { createDocument, setDocument, getDocument, deleteDocument } from '@/backend/Database';
+import { database } from '@/backend/Firebase';
+import { collection, getDocs } from 'firebase/firestore'
 
 // Reroutes user to the / directory if they are not logged in
-
-/* For something with the datebase
-rules_version = '2';
-
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-}
-*/
 
 const Dashboard = () => {
 
@@ -31,14 +22,60 @@ const Dashboard = () => {
 
   const [ title, setTitle ] = useState('');
   const [ description, setDescription ] = useState('');
+  const [ date, setDate ] = useState('');
   const [ startTime, setStartTime ] = useState('');
   const [ endTime, setEndTime ] = useState('');
+
+
+  const [dates, setDates] = useState(() => getDates());
+
+  function getDates() {
+      let dateArray = [];
+
+      for (let i = 0; i < 7; i++) {
+          // Offset the current day with the product number of the number of milliseconds in a day and i 
+          let date = new Date(Date.now() + 24 * 60 * 60 * 1000 * i);
+          // Track the date in human readable format and the milliseconds since epoch
+          dateArray.push(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate());
+      }
+
+      return dateArray;
+  }
 
   useEffect(() => {
     if(!user){
       router.push('/')
     } 
   }, [user])
+
+  // const finalData = populateWrapperData();
+  
+  async function populateWrapperData() {
+    const myRef = collection(database, `users/${user.email}/events/`);
+    let snapshot = await getDocs(myRef);
+
+    let results = [];
+
+    snapshot.forEach(doc => {
+      results.push(doc.data());
+    });
+    
+    console.log(results);
+
+    return results;
+  }
+  
+  function populateWrappers(i) {
+    let finalData = populateWrapperData();
+
+    // finalData.then(result => {
+    //   result.forEach(item => {
+    //     if (item.date == dates[i]) return "hit";
+    //   });
+    // });
+
+    return finalData.toString();
+  }
 
   async function callQuoteAPI() {
     const url = 'https://quotes-api12.p.rapidapi.com/quotes/random?type=success';
@@ -59,7 +96,6 @@ const Dashboard = () => {
       console.error(error);
     }
   }
-
   
   // Function to handle when the user clicks the plus button
   // Needs to create a popup to get the event information, remove the popoup,
@@ -68,9 +104,9 @@ const Dashboard = () => {
     document.getElementById("dialog").showModal();
   }
 
-  function closeModal() {
-    alert(title + ", " + description + ", " +  startTime + ", " +  endTime);
+  async function closeModal() {    
     document.getElementById("dialog").close();
+    const id = await createDocument(`users/${user.email}/events/`, { title, description, date, startTime, endTime });
   }
 
   return (
@@ -81,26 +117,29 @@ const Dashboard = () => {
           <h2>Lets add an event</h2>
           <InputWrapper>
             <InputTitle>Event Title</InputTitle>
-            <Input type="text" value={title} onChange={(e) => setTitle(e.target.value)}/>
+            <Input className="modalInput" type="text" value={title} onChange={(e) => setTitle(e.target.value)} required/>
           </InputWrapper>
           <InputWrapper>
             <InputTitle>Description</InputTitle>
-            <Input type="text" value={description} onChange={(e) => setDescription(e.target.value)}/>
+            <Input className="modalInput" type="text" value={description} onChange={(e) => setDescription(e.target.value)} required/>
+          </InputWrapper>
+          <InputWrapper>
+            <InputTitle>Date</InputTitle>
+            <Input className="modalInput" type="date" value={date} onChange={(e) => setDate(e.target.value)} required/>
           </InputWrapper>
           <InputWrapper>
             <InputTitle>Start Time</InputTitle>
-            <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)}/>
+            <Input className="modalInput" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required/>
           </InputWrapper>
           <InputWrapper>
             <InputTitle>End Time</InputTitle>
-            <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)}/>
+            <Input className="modalInput" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required/>
           </InputWrapper>
           <MainButton onClick={closeModal}>Add Event</MainButton>
         </Dialog>
         <Left>
           <DateBar></DateBar>
           <div>
-
             <TimeBar>
               <h4>1 PM</h4>
               <h4>2 PM</h4>
@@ -116,13 +155,13 @@ const Dashboard = () => {
               <h4>12 PM</h4>
             </TimeBar>
             <ItemRowWrapper>
-              <ItemRow>Nothing to do...</ItemRow>
-              <ItemRow>Nothing to do...</ItemRow>
-              <ItemRow>Nothing to do...</ItemRow>
-              <ItemRow>Nothing to do...</ItemRow>
-              <ItemRow>Nothing to do...</ItemRow>
-              <ItemRow>Nothing to do...</ItemRow>
-              <ItemRow>Nothing to do...</ItemRow>
+              <ItemRow>{populateWrappers(0) || "Nothing to do!"}</ItemRow>
+              <ItemRow>{populateWrappers(1) || "Nothing to do!"}</ItemRow>
+              <ItemRow>{populateWrappers(2) || "Nothing to do!"}</ItemRow>
+              <ItemRow>{populateWrappers(3) || "Nothing to do!"}</ItemRow>
+              <ItemRow>{populateWrappers(4) || "Nothing to do!"}</ItemRow>
+              <ItemRow>{populateWrappers(5) || "Nothing to do!"}</ItemRow>
+              <ItemRow>{populateWrappers(6) || "Nothing to do!"}</ItemRow>
             </ItemRowWrapper>
 
             <Plus onClick={openModal}>+</Plus>
@@ -147,7 +186,6 @@ const Dialog = styled.dialog`
   z-index: 10;
   padding: 0.8rem 1.2rem;
   border-radius: 4px;
-
 `;
 
 const InputWrapper = styled.div`

@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useRouter } from 'next/router'
 import { useStateContext } from '@/context/StateContext'
-import { isEmailInUse, register} from '@/backend/Auth'
+import { isEmailInUse, register, loginUser} from '@/backend/Auth'
 import Link from 'next/link'
 import Navbar from '@/components/Dashboard/Navbar'
+import { createDocument } from '@/backend/Database'
 
 // auth/signup
 
@@ -37,7 +38,12 @@ const Signup = () => {
     if(!isValidEmail){ return; }
     
     try{
-        await register(email, password, setUser)
+        await register(email, password);
+        let newUser = await loginUser(email, password);
+        setUser(newUser);
+        
+        await createDocument(`users/${email}/events`, {});
+
         router.push('/dashboard')
     }catch(err){
         console.log('Error Signing Up', err)
