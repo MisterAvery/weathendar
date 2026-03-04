@@ -49,7 +49,7 @@ const Dashboard = () => {
   }, [user])
 
   async function populateItemRowWrapper() {
-    const myRef = collection(database, `users/${user.email}/events`);
+    const myRef = await collection(database, `users/${user.email}/events`);
     const snapshot = await getDocs(myRef);
 
     const rows = [[], [], [], [], [], [], []];

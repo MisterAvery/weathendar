@@ -38,13 +38,13 @@ const Weather = () => {
         callWeatherAPI,
 
         // Failure callback
-        _ => { alert("Unable to retrieve location data. Please try again.") },
+        _ => { window.alert("Unable to retrieve location data. Please try again.") },
 
         // Timeout the request after 30 seconds
         { timeout: 30000 }
       );
     } else {
-      alert("Unable to get your location. Please try again");
+      window.alert("Unable to get your location. Please try again");
     }
   }
   
