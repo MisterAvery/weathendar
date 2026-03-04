@@ -16,37 +16,37 @@ const Weather = () => {
     return converted.getHours() + ":" + converted.getSeconds();
   }
   
-  async function callWeatherAPI(position) {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
-    const KEY = '1a63b31fa752648c49caa682197af3d8';
+  // async function callWeatherAPI(position) {
+  //   const lat = position.coords.latitude;
+  //   const lon = position.coords.longitude;
+  //   const KEY = '1a63b31fa752648c49caa682197af3d8';
 
-    await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&exclude={part}&appid=${KEY}&units=imperial`)
-      .then(response => response.json())
-      .then(response => {
-        console.log(response);
-        setData(response);
-      }
-      ).catch(err => console.error(err));
-  }
+  //   await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&exclude={part}&appid=${KEY}&units=imperial`)
+  //     .then(response => response.json())
+  //     .then(response => {
+  //       console.log(response);
+  //       setData(response);
+  //     }
+  //     ).catch(err => console.error(err));
+  // }
 
   // Call the OpenWeatherMap API and render the information
-  async function getWeatherData() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        // Success callback 
-        callWeatherAPI,
+  // async function getWeatherData() {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       // Success callback 
+  //       callWeatherAPI,
 
-        // Failure callback
-        _ => { window.alert("Unable to retrieve location data. Please try again.") },
+  //       // Failure callback
+  //       _ => { window.alert("Unable to retrieve location data. Please try again.") },
 
-        // Timeout the request after 30 seconds
-        { timeout: 30000 }
-      );
-    } else {
-      window.alert("Unable to get your location. Please try again");
-    }
-  }
+  //       // Timeout the request after 30 seconds
+  //       { timeout: 30000 }
+  //     );
+  //   } else {
+  //     window.alert("Unable to get your location. Please try again");
+  //   }
+  // }
   
   return (
     <>
