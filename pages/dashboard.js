@@ -48,25 +48,25 @@ const Dashboard = () => {
     } 
   }, [user])
 
-  // async function populateItemRowWrapper() {
-  //   const myRef = await collection(database, `users/${user.email}/events`);
-  //   const snapshot = await getDocs(myRef);
+  async function populateItemRowWrapper() {
+    const myRef = await collection(database, `users/${user.email}/events`);
+    const snapshot = await getDocs(myRef);
 
-  //   const rows = [[], [], [], [], [], [], []];
+    const rows = [[], [], [], [], [], [], []];
 
-  //   // I JUST LANDED ON THE MOON!!!!!!!!
-  //   snapshot.forEach((item) => {
-  //     let data = item.data();
+    // I JUST LANDED ON THE MOON!!!!!!!!
+    snapshot.forEach((item) => {
+      let data = item.data();
 
-  //     for (let i = 0; i < dates.length; i++) {
-  //       if (data.date == dates[i]) rows[i].push(data);
-  //     }
-  //   });
+      for (let i = 0; i < dates.length; i++) {
+        if (data.date == dates[i]) rows[i].push(data);
+      }
+    });
 
-  //   setRowData(rows);
-  // } 
+    setRowData(rows);
+  } 
 
-  // useEffect(() => { populateItemRowWrapper() }, []);
+  useEffect(() => { populateItemRowWrapper() }, []);
 
   async function callQuoteAPI() {
     const url = 'https://quotes-api12.p.rapidapi.com/quotes/random?type=success';
@@ -146,13 +146,13 @@ const Dashboard = () => {
               <h4>12 PM</h4>
             </TimeBar>
             <ItemRowWrapper>
-              {/* <ItemRow>{ rowData[0].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
+              <ItemRow>{ rowData[0].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
               <ItemRow>{ rowData[1].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
               <ItemRow>{ rowData[2].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
               <ItemRow>{ rowData[3].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
               <ItemRow>{ rowData[4].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
               <ItemRow>{ rowData[5].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
-              <ItemRow>{ rowData[6].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow> */}
+              <ItemRow>{ rowData[6].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
             </ItemRowWrapper>
 
             <Plus onClick={openModal}>+</Plus>
