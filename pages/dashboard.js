@@ -8,7 +8,7 @@ import FlexDiv from '@/components/FlexDiv'
 import DateBar from '@/components/Dashboard/DateBar'
 import { createDocument, setDocument, getDocument, deleteDocument } from '@/backend/Database';
 import { database } from '@/backend/Firebase';
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
 
 // Reroutes user to the / directory if they are not logged in
 
@@ -26,8 +26,8 @@ const Dashboard = () => {
   const [ startTime, setStartTime ] = useState('');
   const [ endTime, setEndTime ] = useState('');
 
-
   const [dates, setDates] = useState(() => getDates());
+  const [rowData, setRowData] = useState([[], [], [], [], [], [], []]);
 
   function getDates() {
       let dateArray = [];
@@ -36,7 +36,7 @@ const Dashboard = () => {
           // Offset the current day with the product number of the number of milliseconds in a day and i 
           let date = new Date(Date.now() + 24 * 60 * 60 * 1000 * i);
           // Track the date in human readable format and the milliseconds since epoch
-          dateArray.push(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate());
+          dateArray.push(date.getFullYear() + "-" + ((date.getMonth() < 9) ? "0" : "") + (date.getMonth() + 1) + "-" + ((date.getDate()) < 10 ? "0" : "") + date.getDate());
       }
 
       return dateArray;
@@ -48,34 +48,25 @@ const Dashboard = () => {
     } 
   }, [user])
 
-  // const finalData = populateWrapperData();
-  
-  async function populateWrapperData() {
-    const myRef = collection(database, `users/${user.email}/events/`);
-    let snapshot = await getDocs(myRef);
+  async function populateItemRowWrapper() {
+    const myRef = collection(database, `users/${user.email}/events`);
+    const snapshot = await getDocs(myRef);
 
-    let results = [];
+    const rows = [[], [], [], [], [], [], []];
 
-    snapshot.forEach(doc => {
-      results.push(doc.data());
+    // I JUST LANDED ON THE MOON!!!!!!!!
+    snapshot.forEach((item) => {
+      let data = item.data();
+
+      for (let i = 0; i < dates.length; i++) {
+        if (data.date == dates[i]) rows[i].push(data);
+      }
     });
-    
-    console.log(results);
 
-    return results;
-  }
-  
-  function populateWrappers(i) {
-    let finalData = populateWrapperData();
+    setRowData(rows);
+  } 
 
-    // finalData.then(result => {
-    //   result.forEach(item => {
-    //     if (item.date == dates[i]) return "hit";
-    //   });
-    // });
-
-    return finalData.toString();
-  }
+  useEffect(() => { populateItemRowWrapper() }, []);
 
   async function callQuoteAPI() {
     const url = 'https://quotes-api12.p.rapidapi.com/quotes/random?type=success';
@@ -155,13 +146,13 @@ const Dashboard = () => {
               <h4>12 PM</h4>
             </TimeBar>
             <ItemRowWrapper>
-              <ItemRow>{populateWrappers(0) || "Nothing to do!"}</ItemRow>
-              <ItemRow>{populateWrappers(1) || "Nothing to do!"}</ItemRow>
-              <ItemRow>{populateWrappers(2) || "Nothing to do!"}</ItemRow>
-              <ItemRow>{populateWrappers(3) || "Nothing to do!"}</ItemRow>
-              <ItemRow>{populateWrappers(4) || "Nothing to do!"}</ItemRow>
-              <ItemRow>{populateWrappers(5) || "Nothing to do!"}</ItemRow>
-              <ItemRow>{populateWrappers(6) || "Nothing to do!"}</ItemRow>
+              <ItemRow>{ rowData[0].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
+              <ItemRow>{ rowData[1].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
+              <ItemRow>{ rowData[2].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
+              <ItemRow>{ rowData[3].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
+              <ItemRow>{ rowData[4].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
+              <ItemRow>{ rowData[5].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
+              <ItemRow>{ rowData[6].map(data => (<Item>{data.title + ": " + data.description} <br/> {data.startTime + " - " + data.endTime}</Item>)) }</ItemRow>
             </ItemRowWrapper>
 
             <Plus onClick={openModal}>+</Plus>
@@ -287,6 +278,14 @@ const ItemRow = styled(FlexDiv)`
   border-bottom: 1px solid black;
   padding: 0.5rem;
   background: #b5b5b558;
+`;
+
+const Item = styled(FlexDiv)`
+  background: #111111dd;
+  border-radius: 4px;
+  color: white;
+  padding: 0.5rem;
+  margin-right: 5px;
 `;
 
 const Plus = styled.button`
